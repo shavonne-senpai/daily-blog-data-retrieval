@@ -15,7 +15,7 @@ const token = jwt.sign({}, Buffer.from(secret, 'hex'), {
 
 async function getGhostPosts() {
   const response = await fetch(
-    `${GHOST_API_URL}/ghost/api/admin/posts/?filter=status:published&fields=id,title,slug,url,published_at,featured,tags&limit=all`,
+    `${GHOST_API_URL}/ghost/api/admin/posts/?filter=status:published&include=id,title,slug,url,published_at,featured,tags&limit=all`,
     {
       headers: {
         Authorization: `Ghost ${token}`
