@@ -47,7 +47,16 @@ async function getNotionPages() {
 }
 
 async function createNotionPage(ghostPost) {
-  const tagNames = ghostPost.tags ? ghostPost.tags.map(tag => tag.name) : [];
+  // Better tag handling
+  let tagNames = [];
+  if (ghostPost.tags && Array.isArray(ghostPost.tags)) {
+    tagNames = ghostPost.tags.map(tag => {
+      // Ghost tags might be objects with {name: "tagname"} or just strings
+      return typeof tag === 'string' ? tag : tag.name;
+    }).filter(name => name); // Remove any undefined/null values
+  }
+  
+  console.log(`Tags for ${ghostPost.title}:`, tagNames); // Debug
   
   const response = await fetch(`https://api.notion.com/v1/pages`, {
     method: 'POST',
@@ -72,7 +81,7 @@ async function createNotionPage(ghostPost) {
           date: { start: ghostPost.published_at }
         },
         'Tags': {
-          multi_select: tagNames.map(name => ({ name }))
+          multi_select: tagNames.map(name => ({ name: name }))
         },
         'Featured': {
           checkbox: ghostPost.featured || false
@@ -91,6 +100,9 @@ async function createNotionPage(ghostPost) {
   
   if (!response.ok) {
     console.error(`Failed to create page for ${ghostPost.title}:`, result);
+    console.error('Full request body:', JSON.stringify({
+      properties: { Tags: { multi_select: tagNames.map(name => ({ name: name })) } }
+    }, null, 2));
     throw new Error(result.message);
   }
   
@@ -98,8 +110,16 @@ async function createNotionPage(ghostPost) {
 }
 
 
+
 async function updateNotionPage(pageId, ghostPost) {
-  const tagNames = ghostPost.tags ? ghostPost.tags.map(tag => tag.name) : [];
+// Better tag handling
+  let tagNames = [];
+  if (ghostPost.tags && Array.isArray(ghostPost.tags)) {
+    tagNames = ghostPost.tags.map(tag => {
+      // Ghost tags might be objects with {name: "tagname"} or just strings
+      return typeof tag === 'string' ? tag : tag.name;
+    }).filter(name => name); // Remove any undefined/null values
+  }
   
   await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
     method: 'PATCH',
