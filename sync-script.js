@@ -49,7 +49,7 @@ async function getNotionPages() {
 async function createNotionPage(ghostPost) {
   const tagNames = ghostPost.tags ? ghostPost.tags.map(tag => tag.name) : [];
   
-  await fetch(`https://api.notion.com/v1/pages`, {
+  const response = await fetch(`https://api.notion.com/v1/pages`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${NOTION_TOKEN}`,
@@ -78,7 +78,7 @@ async function createNotionPage(ghostPost) {
           checkbox: ghostPost.featured || false
         },
         'Views': {
-          number: 0  // Will be updated later with GA4
+          number: 0
         },
         'Last Synced': {
           date: { start: new Date().toISOString() }
@@ -87,8 +87,16 @@ async function createNotionPage(ghostPost) {
     })
   });
   
-  console.log(`Created new page for: ${ghostPost.title}`);
+  const result = await response.json();
+  
+  if (!response.ok) {
+    console.error(`Failed to create page for ${ghostPost.title}:`, result);
+    throw new Error(result.message);
+  }
+  
+  console.log(`✓ Created new page for: ${ghostPost.title}`);
 }
+
 
 async function updateNotionPage(pageId, ghostPost) {
   const tagNames = ghostPost.tags ? ghostPost.tags.map(tag => tag.name) : [];
