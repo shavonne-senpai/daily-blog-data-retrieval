@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: '18'
       
+      - name: Install dependencies
+        run: npm install jsonwebtoken
+      
       - name: Run sync script
         env:
           GHOST_API_URL: ${{ secrets.GHOST_API_URL }}
