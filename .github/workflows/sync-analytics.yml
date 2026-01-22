@@ -18,7 +18,7 @@ jobs:
           node-version: '18'
       
       - name: Install dependencies
-        run: npm install jsonwebtoken
+        run: npm install jsonwebtoken @google-analytics/data
       
       - name: Run sync script
         env:
@@ -26,4 +26,6 @@ jobs:
           GHOST_ADMIN_KEY: ${{ secrets.GHOST_ADMIN_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: node sync-script.js
